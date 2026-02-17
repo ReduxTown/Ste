@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Roblox Username Batch Generator & Checker</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      color: #e0e0e0;
+      margin: 0;
+      padding: 20px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    h1 { margin: 30px 0 10px; text-shadow: 0 2px 8px rgba(0,0,0,0.6); }
+    .container {
+      background: rgba(255,255,255,0.08);
+      backdrop-filter: blur(12px);
+      border-radius: 16px;
+      padding: 25px;
+      width: 100%;
+      max-width: 600px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+      border: 1px solid rgba(255,255,255,0.12);
+    }
+    label { display: block; margin: 10px 0 5px; font-weight: bold; }
+    input, select, button {
+      width: 100%;
+      padding: 12px;
+      margin: 6px 0;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+    button {
+      background: #00c853;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    button:hover { background: #00b140; transform: translateY(-1px); }
+    button:disabled { background: #555; cursor: not-allowed; }
+    #resultList {
+      margin-top: 20px;
+      max-height: 400px;
+      overflow-y: auto;
+      background: rgba(0,0,0,0.3);
+      border-radius: 8px;
+      padding: 10px;
+      list-style: none;
+    }
+    #resultList li {
+      padding: 8px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .available { color: #00ff9d; font-weight: bold; }
+    .taken { color: #ff6b6b; }
+    .progress { margin: 10px 0; height: 8px; background: #444; border-radius: 4px; overflow: hidden; }
+    .progress-bar { height: 100%; width: 0%; background: #00c853; transition: width 0.4s; }
+    .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 15px; }
+    .actions button { flex: 1; min-width: 140px; background: #2196f3; }
+    .actions button:nth-child(2) { background: #ff9800; }
+    .actions button:nth-child(3) { background: #9c27b0; }
+    footer { margin-top: auto; padding: 20px; font-size: 14px; opacity: 0.7; text-align: center; }
+  </style>
+</head>
+<body>
+
+  <h1>Roblox Batch Username Generator</h1>
+  
+  <div class="container">
+    <label>Batch Size</label>
+    <select id="batchSize">
+      <option value="5">5 usernames</option>
+      <option value="10" selected>10 usernames</option>
+      <option value="20">20 usernames</option>
+      <option value="50">50 usernames (slower)</option>
+    </select>
+
+    <label>Include "MPH" (prefix/suffix/random)</label>
+    <select id="mphMode">
+      <option value="none">No MPH</option>
+      <option value="prefix">Prefix (MPH...)</option>
+      <option value="suffix">Suffix (...MPH)</option>
+      <option value="random">Random placement</option>
+    </select>
+
+    <label>Custom Keyword (optional, e.g. Ace, Pro, xX)</label>
+    <input type="text" id="keyword" placeholder="e.g. Ace" />
+
+    <button id="generateBtn">Generate & Check Batch</button>
+
+    <div class="progress"><div class="progress-bar" id="progressBar"></div></div>
+
+    <ul id="resultList"></ul>
+
+    <div class="actions">
+      <button id="copyAllBtn">Copy All</button>
+      <button id="copyAvailBtn">Copy Available Only</button>
+      <button id="shareBtn">Share Available</button>
+      <button id="clearBtn">Clear List</button>
+    </div>
+  </div>
+
+  <footer>Real-time checks via Roblox API • Respect rate limits (~3/sec) • For fun only • Columbus vibes 2026 🚀</footer>
+
+  <script>
+    const generateBtn = document.getElementById('generateBtn');
+    const resultList = document.getElementById('resultList');
+    const progressBar = document.getElementById('progressBar');
+    const copyAllBtn = document.getElementById('copyAllBtn');
+    const copyAvailBtn = document.getElementById('copyAvailBtn');
+    const shareBtn = document.getElementById('shareBtn');
+    const clearBtn = document.getElementById('clearBtn');
+
+    const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    const minLen = 3;
+    const maxLen = 20;
+    const delayMs = 350; // polite to API (~2-3 req/sec)
+
+    let results = []; // store {name, available}
+
+    function randomChar() {
+      return chars[Math.floor(Math.random() * chars.length)];
+    }
+
+    function randomUsername(base = '') {
+      let len = Math.floor(Math.random() * (maxLen - minLen + 1)) + minLen;
+      let username = base;
+      let underscore = 0;
+
+      while (username.length < len) {
+        let ch = randomChar();
+        if (ch === '_' && underscore >= 1) ch = randomChar(); // max 1 _
+        if (ch === '_') underscore++;
+        username += ch;
+      }
+
+      if (username.startsWith('_') || username.endsWith('_')) {
+        return randomUsername(base); // retry
+      }
+      return username;
+    }
+
+    function applyMph(username, mode) {
+      if (mode === 'none') return username;
+      const positions = ['prefix', 'suffix', 'random'];
+      const chosen = mode === 'random' ? positions[Math.floor(Math.random()*3)] : mode;
+
+      if (chosen === 'prefix') return 'MPH' + username;
+      if (chosen === 'suffix') return username + 'MPH';
+      return username; // fallback
+    }
+
+    async function isAvailable(username) {
+      try {
+        const res = await fetch(
+          `https://auth.roblox.com/v1/usernames/validate?username=${encodeURIComponent(username)}&context=Signup`
+        );
+        if (!res.ok) return false;
+        const data = await res.json();
+        return data.code === 0; // 0 = valid & available
+      } catch {
+        return false;
+      }
+    }
+
+    async function generateBatch() {
+      generateBtn.disabled = true;
+      generateBtn.textContent = 'Checking...';
+      resultList.innerHTML = '<li>Starting batch check...</li>';
+      progressBar.style.width = '0%';
+      results = [];
+
+      const batchSize = parseInt(document.getElementById('batchSize').value);
+      const mphMode = document.getElementById('mphMode').value;
+      const keyword = document.getElementById('keyword').value.trim();
+
+      for (let i = 0; i < batchSize; i++) {
+        let name = randomUsername(keyword);
+        name = applyMph(name, mphMode);
+        const available = await isAvailable(name);
+
+        results.push({name, available});
+
+        // Update UI
+        const percent = Math.round(((i + 1) / batchSize) * 100);
+        progressBar.style.width = percent + '%';
+
+        const li = document.createElement('li');
+        li.innerHTML = `<span>${name}</span><span class="${available ? 'available' : 'taken'}">${available ? 'AVAILABLE ✅' : 'Taken'}</span>`;
+        resultList.appendChild(li);
+
+        await new Promise(r => setTimeout(r, delayMs));
+      }
+
+      generateBtn.disabled = false;
+      generateBtn.textContent = 'Generate Another Batch';
+      resultList.firstChild?.remove(); // remove "starting" msg if present
+    }
+
+    function getAvailableNames() {
+      return results.filter(r => r.available).map(r => r.name);
+    }
+
+    function getAllNames() {
+      return results.map(r => r.name);
+    }
+
+    copyAllBtn.onclick = () => {
+      navigator.clipboard.writeText(getAllNames().join('\n'));
+      copyAllBtn.textContent = 'Copied All!';
+      setTimeout(() => copyAllBtn.textContent = 'Copy All', 2000);
+    };
+
+    copyAvailBtn.onclick = () => {
+      const avail = getAvailableNames();
+      if (avail.length === 0) return alert('No available usernames yet!');
+      navigator.clipboard.writeText(avail.join('\n'));
+      copyAvailBtn.textContent = 'Copied Available!';
+      setTimeout(() => copyAvailBtn.textContent = 'Copy Available Only', 2000);
+    };
+
+    shareBtn.onclick = () => {
+      const avail = getAvailableNames();
+      if (avail.length === 0) return alert('No available usernames to share!');
+      const text = `Found some 🔥 available Roblox usernames:\n${avail.join('\n')}\n\nGenerated @ your cool site!`;
+      navigator.clipboard.writeText(text);
+      shareBtn.textContent = 'Share Text Copied!';
+      setTimeout(() => shareBtn.textContent = 'Share Available', 2000);
+    };
+
+    clearBtn.onclick = () => {
+      results = [];
+      resultList.innerHTML = '';
+      progressBar.style.width = '0%';
+    };
+
+    generateBtn.addEventListener('click', generateBatch);
+  </script>
+</body>
+</html>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Roblox Username Sniper - Batch Checker 2026</title>
+  <title>Roblox Username Sniper - Fixed 2026</title>
   <style>
     :root {
       --bg: #0d1117;
@@ -14,7 +14,7 @@
       --accent: #00c853;
     }
     body {
-      font-family: 'Segoe UI', system-ui, sans-serif;
+      font-family: system-ui, sans-serif;
       background: linear-gradient(135deg, #0d1117, #1a2332);
       color: #c9d1d9;
       margin: 0;
@@ -24,28 +24,18 @@
       flex-direction: column;
       align-items: center;
     }
-    h1 {
-      font-size: 2.2rem;
-      margin: 20px 0 10px;
-      color: var(--green);
-      text-shadow: 0 0 10px rgba(0,255,157,0.4);
-    }
+    h1 { font-size: 2.4rem; margin: 20px 0 10px; color: var(--green); text-shadow: 0 0 12px rgba(0,255,157,0.5); }
     .container {
       background: var(--card);
       border: 1px solid #30363d;
       border-radius: 12px;
       padding: 24px;
       width: 100%;
-      max-width: 620px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+      max-width: 640px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.7);
     }
-    label {
-      display: block;
-      margin: 12px 0 6px;
-      font-weight: 600;
-      color: #8b949e;
-    }
-    select, input[type="text"], button {
+    label { display: block; margin: 14px 0 6px; font-weight: 600; color: #8b949e; }
+    select, input[type="text"], input[type="number"], button {
       width: 100%;
       padding: 12px 14px;
       margin: 4px 0 12px;
@@ -61,35 +51,18 @@
       font-weight: bold;
       border: none;
       cursor: pointer;
-      transition: all 0.2s;
+      transition: all 0.25s;
     }
-    button:hover:not(:disabled) {
-      background: #00b140;
-      transform: translateY(-1px);
-    }
-    button:disabled {
-      background: #21262d;
-      color: #8b949e;
-      cursor: not-allowed;
-    }
-    .progress {
-      height: 10px;
-      background: #21262d;
-      border-radius: 5px;
-      margin: 16px 0;
-      overflow: hidden;
-    }
-    .progress-bar {
-      height: 100%;
-      width: 0%;
-      background: var(--green);
-      transition: width 0.4s ease;
-    }
+    button:hover:not(:disabled) { background: #00b140; transform: translateY(-2px); }
+    button:disabled { background: #21262d; color: #8b949e; cursor: not-allowed; }
+    .status { margin: 12px 0; padding: 10px; border-radius: 6px; background: #21262d; text-align: center; font-weight: bold; }
+    .progress { height: 10px; background: #21262d; border-radius: 5px; margin: 16px 0; overflow: hidden; }
+    .progress-bar { height: 100%; width: 0%; background: var(--green); transition: width 0.5s ease; }
     #resultList {
       list-style: none;
       padding: 0;
       margin: 20px 0;
-      max-height: 380px;
+      max-height: 420px;
       overflow-y: auto;
       border: 1px solid #30363d;
       border-radius: 8px;
@@ -100,73 +73,54 @@
       border-bottom: 1px solid #21262d;
       display: flex;
       justify-content: space-between;
-      align-items: center;
       font-size: 15px;
     }
-    #resultList li:last-child { border-bottom: none; }
-    .available { color: var(--green); font-weight: 600; }
+    .available { color: var(--green); font-weight: 700; }
     .taken { color: var(--red); }
-    .actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 20px;
-    }
-    .actions button {
-      flex: 1 1 140px;
-      padding: 12px;
-      font-size: 14px;
-    }
-    .actions .copy-all { background: var(--blue); color: white; }
-    .actions .copy-avail { background: #d18616; color: white; }
-    .actions .share { background: #9d4edd; color: white; }
-    .actions .clear { background: #c94d4d; color: white; }
-    .toggle-filter {
-      margin: 10px 0;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    footer {
-      margin-top: auto;
-      padding: 30px 0 10px;
-      font-size: 13px;
-      opacity: 0.6;
-      text-align: center;
-    }
+    .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 24px; }
+    .actions button { flex: 1 1 150px; padding: 14px; font-size: 15px; }
+    .copy-all { background: var(--blue); color: white; }
+    .copy-avail { background: #d18616; color: white; }
+    .share { background: #9d4edd; color: white; }
+    .clear { background: #c94d4d; color: white; }
+    .toggle { display: flex; align-items: center; gap: 10px; margin: 12px 0; }
+    footer { margin-top: auto; padding: 40px 0 20px; font-size: 14px; opacity: 0.7; text-align: center; }
   </style>
 </head>
 <body>
 
-  <h1>Roblox Username Sniper</h1>
+  <h1>Roblox Username Sniper (Fixed!)</h1>
   
   <div class="container">
-    <label>Batch Size (higher = slower but more chances)</label>
+    <label>Batch Size</label>
     <select id="batchSize">
       <option value="5">5</option>
       <option value="10" selected>10</option>
       <option value="20">20</option>
-      <option value="40">40 (patient mode)</option>
+      <option value="30">30 (take your time)</option>
     </select>
+
+    <label>Min Length (6+ recommended — short ones gone forever)</label>
+    <input type="number" id="minLen" value="6" min="3" max="15" />
 
     <label>MPH Style</label>
     <select id="mphMode">
       <option value="none">No MPH</option>
-      <option value="prefix">MPH Prefix</option>
-      <option value="suffix">MPH Suffix</option>
-      <option value="random">Random MPH Placement</option>
+      <option value="prefix">Prefix (MPH...)</option>
+      <option value="suffix">Suffix (...MPH)</option>
     </select>
 
-    <label>Keyword / Base (optional)</label>
-    <input type="text" id="keyword" placeholder="e.g. Ace, Pro, xX" />
+    <label>Keyword/Base (optional — e.g. Ace, Ohio, Pro)</label>
+    <input type="text" id="keyword" placeholder="e.g. Ace" />
 
-    <button id="generateBtn">Snipe Batch (Check Availability)</button>
+    <button id="generateBtn">Snipe & Check Batch</button>
 
     <div class="progress"><div class="progress-bar" id="progressBar"></div></div>
+    <div class="status" id="status">Ready — hit Snipe!</div>
 
-    <div class="toggle-filter">
+    <div class="toggle">
       <input type="checkbox" id="showOnlyAvail" />
-      <label for="showOnlyAvail" style="margin:0;">Show only AVAILABLE names</label>
+      <label for="showOnlyAvail">Show only AVAILABLE 🔥</label>
     </div>
 
     <ul id="resultList"></ul>
@@ -174,15 +128,16 @@
     <div class="actions">
       <button class="copy-all" id="copyAllBtn">Copy All</button>
       <button class="copy-avail" id="copyAvailBtn">Copy Available</button>
-      <button class="share" id="shareBtn">Share Good Ones</button>
-      <button class="clear" id="clearBtn">Clear</button>
+      <button class="share" id="shareBtn">Share Winners</button>
+      <button class="clear" id="clearBtn">Clear List</button>
     </div>
   </div>
 
-  <footer>Using RoProxy for reliable checks • Always double-check on roblox.com/signup • Ace's tool - Columbus 2026 🌙</footer>
+  <footer>RoProxy-powered • Real-time checks • Verify on roblox.com/signup • Ace's Columbus tool 2026 🌙</footer>
 
   <script>
     const generateBtn   = document.getElementById('generateBtn');
+    const statusDiv     = document.getElementById('status');
     const resultList    = document.getElementById('resultList');
     const progressBar   = document.getElementById('progressBar');
     const copyAllBtn    = document.getElementById('copyAllBtn');
@@ -192,81 +147,96 @@
     const showOnlyAvail = document.getElementById('showOnlyAvail');
 
     const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-    const minLen = 4;   // bumped to 4+ since 3 is ultra-rare now
-    const maxLen = 18;
-    const delayMs = 500; // polite + avoids rate limits
+    const delayMs = 800; // safer rate
 
-    let results = []; // {name: string, available: bool}
+    let results = [];
 
     function randomChar() { return chars[Math.floor(Math.random() * chars.length)]; }
 
-    function generateBase() {
+    function generateBase(minLen) {
+      const maxLen = 20;
       const len = Math.floor(Math.random() * (maxLen - minLen + 1)) + minLen;
       let name = '';
-      let hasUnderscore = false;
+      let underscore = false;
 
       for (let i = 0; i < len; i++) {
         let ch = randomChar();
-        if (ch === '_' && hasUnderscore) ch = randomChar(); // max 1 _
-        if (ch === '_') hasUnderscore = true;
+        if (ch === '_' && underscore) ch = randomChar();
+        if (ch === '_') underscore = true;
         name += ch;
       }
 
-      // Roblox: no start/end with _, no consecutive __ (already prevented)
-      if (name.startsWith('_') || name.endsWith('_')) return generateBase();
+      if (name.startsWith('_') || name.endsWith('_')) return generateBase(minLen);
       return name;
     }
 
     function applyMph(name, mode) {
       if (mode === 'none') return name;
-      const roll = mode === 'random' ? ['prefix','suffix'][Math.floor(Math.random()*2)] : mode;
-      if (roll === 'prefix') return 'MPH' + name;
-      if (roll === 'suffix') return name + 'MPH';
+      if (mode === 'prefix') return 'MPH' + name;
+      if (mode === 'suffix') return name + 'MPH';
       return name;
     }
 
-    async function checkAvailable(username) {
+    async function isTaken(username) {
       try {
-        const proxyUrl = `https://auth.roproxy.com/v1/usernames/validate?username=${encodeURIComponent(username)}&context=Signup`;
-        const res = await fetch(proxyUrl, { cache: 'no-store' });
-        if (!res.ok) return false;
+        // Primary: POST to resolve usernames → if returns data → taken
+        const proxy = 'https://users.roproxy.com/v1/usernames/users';
+        const res = await fetch(proxy, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ usernames: [username], excludeBannedUsers: false })
+        });
+        if (!res.ok) throw new Error('POST failed');
         const data = await res.json();
-        // code: 0 = valid AND available
-        return data.code === 0;
+        if (data.data && data.data.length > 0) return true; // has user ID → taken
+
+        // Fallback: old validate GET
+        const validateUrl = `https://auth.roproxy.com/v1/usernames/validate?username=${encodeURIComponent(username)}&context=Signup`;
+        const vRes = await fetch(validateUrl);
+        if (!vRes.ok) return true; // assume taken on error
+        const vData = await vRes.json();
+        return vData.code !== 0; // anything not 0 = taken/invalid
       } catch (err) {
-        console.error(err);
-        return false;
+        console.error('Check failed for', username, err);
+        return true; // conservative: treat errors as taken
       }
     }
 
     async function snipeBatch() {
       generateBtn.disabled = true;
       generateBtn.textContent = 'Sniping...';
-      resultList.innerHTML = '<li style="color:#8b949e;">Starting checks...</li>';
+      statusDiv.textContent = 'Starting batch — patience is key 🔥';
+      statusDiv.style.background = '#21262d';
+      resultList.innerHTML = '';
       progressBar.style.width = '0%';
       results = [];
 
       const size = parseInt(document.getElementById('batchSize').value);
+      const minLen = parseInt(document.getElementById('minLen').value) || 6;
       const mph = document.getElementById('mphMode').value;
       const keyword = (document.getElementById('keyword').value || '').trim();
 
       for (let i = 0; i < size; i++) {
-        let base = keyword ? keyword + generateBase().slice(0, maxLen - keyword.length) : generateBase();
+        let base = keyword ? keyword + generateBase(Math.max(minLen - keyword.length, 3)) : generateBase(minLen);
+        base = base.slice(0, 20 - (mph !== 'none' ? 3 : 0)); // room for MPH
         let name = applyMph(base, mph);
 
-        const isAvail = await checkAvailable(name);
+        statusDiv.textContent = `Trying: ${name} ...`;
+        const taken = await isTaken(name);
+        const available = !taken;
 
-        results.push({ name, available: isAvail });
+        results.push({ name, available });
 
-        // Live UI update
         const percent = Math.round(((i + 1) / size) * 100);
         progressBar.style.width = percent + '%';
 
-        renderList(); // refresh list with filter
+        renderList();
 
         await new Promise(r => setTimeout(r, delayMs));
       }
 
+      statusDiv.textContent = `Batch done! Found ${results.filter(r => r.available).length} available 🚀`;
+      statusDiv.style.background = results.some(r => r.available) ? 'rgba(0,255,157,0.2)' : '#21262d';
       generateBtn.disabled = false;
       generateBtn.textContent = 'Snipe Another Batch';
     }
@@ -274,14 +244,14 @@
     function renderList() {
       resultList.innerHTML = '';
       const onlyAvail = showOnlyAvail.checked;
-      const filtered = onlyAvail ? results.filter(r => r.available) : results;
+      const shown = onlyAvail ? results.filter(r => r.available) : results;
 
-      if (filtered.length === 0) {
-        resultList.innerHTML = '<li style="color:#8b949e; text-align:center;">No results yet... or none available</li>';
+      if (shown.length === 0) {
+        resultList.innerHTML = '<li style="color:#8b949e; text-align:center; padding:20px;">No results — or none available yet 😅</li>';
         return;
       }
 
-      filtered.forEach(r => {
+      shown.forEach(r => {
         const li = document.createElement('li');
         li.innerHTML = `<span>${r.name}</span><span class="${r.available ? 'available' : 'taken'}">${r.available ? 'AVAILABLE 🔥' : 'Taken'}</span>`;
         resultList.appendChild(li);
@@ -292,33 +262,34 @@
     function getAll() { return results.map(r => r.name); }
 
     copyAllBtn.onclick = () => {
-      if (results.length === 0) return;
+      if (!results.length) return;
       navigator.clipboard.writeText(getAll().join('\n'));
       copyAllBtn.textContent = 'All Copied!';
-      setTimeout(() => copyAllBtn.textContent = 'Copy All', 1800);
+      setTimeout(() => copyAllBtn.textContent = 'Copy All', 2000);
     };
 
     copyAvailBtn.onclick = () => {
       const avail = getAvailable();
-      if (avail.length === 0) return alert('No available names found yet!');
+      if (!avail.length) return alert('No available yet — try bigger batch!');
       navigator.clipboard.writeText(avail.join('\n'));
       copyAvailBtn.textContent = 'Available Copied!';
-      setTimeout(() => copyAvailBtn.textContent = 'Copy Available', 1800);
+      setTimeout(() => copyAvailBtn.textContent = 'Copy Available', 2000);
     };
 
     shareBtn.onclick = () => {
       const avail = getAvailable();
-      if (avail.length === 0) return alert('Nothing available to share!');
-      const text = `Rare Roblox usernames I sniped:\n${avail.join('\n')}\n\nGrab them fast @ roblox.com/signup\nPowered by Ace's tool 🚀`;
+      if (!avail.length) return alert('No winners to share!');
+      const text = `Sniped some rare Roblox usernames:\n${avail.join('\n')}\n\nGrab quick on roblox.com/signup!\nVia Ace's sniper tool 🚀`;
       navigator.clipboard.writeText(text);
-      shareBtn.textContent = 'Share Text Ready!';
-      setTimeout(() => shareBtn.textContent = 'Share Good Ones', 1800);
+      shareBtn.textContent = 'Share Copied!';
+      setTimeout(() => shareBtn.textContent = 'Share Winners', 2000);
     };
 
     clearBtn.onclick = () => {
       results = [];
       resultList.innerHTML = '';
       progressBar.style.width = '0%';
+      statusDiv.textContent = 'Cleared — ready for next round!';
     };
 
     showOnlyAvail.onchange = renderList;
